@@ -1,8 +1,12 @@
-h1 {
+.App h1 {
+  color: red;
+  margin-bottom: 20px;
   text-align: center;
 }
 
 .dashboard {
-  width: 132px;
+  color: white;
   margin: 0 auto;
+  padding-top: 20px;
+  width: 132px;
 }

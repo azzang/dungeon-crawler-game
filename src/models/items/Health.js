@@ -1,4 +1,4 @@
-var Square = require('../utility/Square');
+var Square = require('../utilities/Square');
 
 function Health(dungeon) {
   Square.call(this, 1, null, 'health');

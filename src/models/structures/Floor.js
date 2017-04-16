@@ -1,4 +1,4 @@
-var Square = require('../utility/Square');
+var Square = require('../utilities/Square');
 
 function Floor(origin) {
   Square.call(this, 1, origin, 'floor');

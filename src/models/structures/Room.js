@@ -1,6 +1,6 @@
-var Vector = require('../utility/Vector');
-var Random = require('../utility/Random');
-var Rectangle = require('../utility/Rectangle');
+var Vector = require('../utilities/Vector');
+var Random = require('../utilities/Random');
+var Rectangle = require('../utilities/Rectangle');
 var Floor = require('../structures/Floor');
 
 function Room(parentsOutgoingSide, exitOrigin) {
@@ -54,14 +54,6 @@ Room.prototype.invertSide = function(side) {
       return 'right';
     default: return;
   }
-};
-
-Room.prototype.floor = function(dungeon) {
-  this.draw(dungeon, Floor);
-  /*this.traverse((i, j) => {
-    var floor = new Floor(new Vector(j, i));
-    floor.draw(dungeon);
-  });*/
 };
 
 module.exports = Room;

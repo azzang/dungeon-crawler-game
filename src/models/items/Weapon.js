@@ -1,4 +1,4 @@
-var Square = require('../utility/Square');
+var Square = require('../utilities/Square');
 
 function Weapon(dungeon, level) {
   Square.call(this, 1, null, 'weapon');

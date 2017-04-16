@@ -25,10 +25,7 @@ Rectangle.prototype.canFit = function(dungeon, allowed) {
 
 Rectangle.prototype.draw = function(dungeon, Item) {
   this.traverse((i, j) => {
-    //var item = new Floor(new Vector(j, i));
-    var item = Item ? new Item(new Vector(j, i)) : this;
-    dungeon[i][j] = item;
-    //floor.draw(dungeon);
+    dungeon[i][j] = Item ? new Item(new Vector(j, i)) : this;
   });
 };
 

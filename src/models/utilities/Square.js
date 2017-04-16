@@ -19,8 +19,4 @@ Square.prototype.drawRandomly = function(dungeon) {
   this.draw(dungeon);
 };
 
-/*Square.prototype.draw = function(dungeon) {
-  dungeon[this.origin.y][this.origin.x] = this;
-};*/
-
 module.exports = Square;

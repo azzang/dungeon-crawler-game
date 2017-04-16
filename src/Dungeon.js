@@ -1,122 +1,74 @@
-import React, { Component } from 'react';
-//import setupLevel from './setup/init';
-import Cells from './setup/Dungeon';
-import Player from './setup/characters/Player';
-import Vector from './setup/utility/Vector';
-import './Dungeon.css';
-import _ from 'underscore';
+var Enemy = require('./models/characters/Enemy');
+var Boss = require('./models/characters/Boss');
 
-class Dungeon extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+var Health = require('./models/items/Health');
+var Weapon = require('./models/items/Weapon');
 
-  componentWillMount() {
-    console.log('dungeon will mount');
-    /*const newCells = this.traverse((row, col, cells, newCells) => {
-      newCells[row][col] = 'wall';
-    });*/
-    const cells = new Cells(0);
-    const player = new Player(cells);
-    player.draw(cells);
-    //const player = setupLevel(newCells, 0); // possibly make level a prop ?
-    //console.log(player);
-    this.setState({ cells: cells, player: player });
+var Floor = require('./models/structures/Floor');
+var Room = require('./models/structures/Room');
+var Wall = require('./models/structures/Wall');
 
-    document.addEventListener('keydown', _.debounce(this.handleKeyDown.bind(this)), false);
+var Manifest = require('./models/utilities/Manifest');
 
-  }
-
-  handleMove(move) {
-    const dungeon = this.state.cells;
-    const player = this.state.player;
-    player.move(move, dungeon);
-    this.setState({ cells: dungeon, player: player });
-    //var stuff = this.state.player.mov(move, this.state.cells);
-    //console.log(stuff);
-    //this.setState({cells: stuff});
-    /*const current = this.state.playerLocation;
-    const next = current.plus(move);
-    const itemInWay = this.state.cells[next.y][next.x];
-    if (itemInWay === 'room') {
-      const stuff = this.copyCells();
-      //const stuff = this.state.cells;
-      stuff[current.y][current.x] = 'room';
-      stuff[next.y][next.x] = 'player';
-      this.setState({
-        cells: stuff,
-        playerLocation: next
-      });
-      //this.props.setCells(stuff);
-    }*/
-  }
-
-  handleKeyDown(e) {
-    switch(e.keyCode) {
-      case 37: // left
-        return this.handleMove(new Vector(-1, 0));
-      case 38: // up
-        return this.handleMove(new Vector(0, -1));
-      case 39: // right
-        return this.handleMove(new Vector(1, 0));
-      case 40: // down
-        return this.handleMove(new Vector(0, 1));
-      default: return;
+function init(dungeon) {
+  for (var i = 0; i < 100; i++) {
+    dungeon[i] = [];
+    for (var j = 0; j < 100; j++) {
+      dungeon[i][j] = new Wall();
     }
-  }
-
-  componentDidMount() {
-    console.log('dungeon did mount');
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log('dungeon getting new props');
-  }
-
-  copyCells() {
-    return this.traverse((row, col, cells, newCells) => {
-      newCells[row][col] = cells[row][col];
-    });
-  }
-
-  getItems() {
-    return this.state.cells.map((arr, row) =>
-      arr.map((item, col) => (<div className={item.selector + ' cell'}></div>)))
-  }
-
-  getItems2() {
-    const current = this.state.playerLocation;
-    const viewBoxOrigin = current.plus(new Vector(-5, -5));
-    const viewBox = [];
-    for (let i = 0, row; i < 11; i++) {
-      row = this.state.cells[i + viewBoxOrigin.y];
-      viewBox[i] = [];
-      for (let j = 0, col; j < 11; j++) {
-        col = row ? row[j + viewBoxOrigin.x] : undefined;
-        viewBox[i][j] = (<div className={col ? 'cell ' + col : 'cell'}></div>);
-      }
-    }
-    return viewBox;
-  }
-
-  traverse(action) {
-    const cells = this.state.cells;
-    const newCells = [];
-    for (let row = 0; row < 100; row++) {
-      newCells[row] = [];
-      for (let col = 0; col < 100; col++) {
-        action(row, col, cells, newCells);
-      }
-    }
-    return newCells;
-  }
-
-  render() {
-    return (
-      <div className='dungeon'>{this.getItems()}</div>
-    );
   }
 }
 
-export default Dungeon;
+function drawRooms(room, dungeon) {
+  room.draw(dungeon, Floor);
+  var count = 1;
+  'top right bottom left'.split(' ').forEach((side) => {
+    var exit = room.getExit(side);
+    if (exit.canFit(dungeon, 'wall')) {
+      var child = new Room(side, exit.origin);
+      if (child.canFit(dungeon, 'wall')) {
+        exit.draw(dungeon);
+        count += drawRooms(child, dungeon);
+      }
+    }
+  });
+  return count;
+}
+
+function getConstructor(name) {
+  switch(name) {
+    case 'health':
+      return Health;
+    case 'weapon':
+      return Weapon;
+    case 'enemy':
+      return Enemy;
+    case 'boss':
+      return Boss;
+    default: return;
+  }
+}
+
+function decorateRooms(dungeon, manifest, level) {
+  var itemName, item, Item;
+  while (itemName = manifest.next()) {
+    Item = getConstructor(itemName);
+    item = new Item(dungeon, level);
+  }
+}
+
+module.exports = function(level) {
+  var dungeon = [];
+  var roomCount = 0;
+  var manifest = new Manifest(level);
+
+  init(dungeon);
+
+  while (roomCount < 4) { // happens rarely
+    roomCount = drawRooms(new Room(), dungeon);
+  }
+
+  decorateRooms(dungeon, manifest, level);
+
+  return dungeon;
+};
