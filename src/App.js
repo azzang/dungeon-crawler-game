@@ -1,51 +1,52 @@
 import React, { Component } from 'react';
-import './App.css';
 import getDungeon from './Dungeon';
 import Player from './models/characters/Player';
 import Vector from './models/utilities/Vector';
-import './Dungeon.css';
-//import _ from 'underscore';
+import './App.css';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    console.log('app constructor underway...');
+    this.state = this.getInitialState();
+    document.addEventListener('keydown', this.handleKeyDown.bind(this));
+  }
 
+  getInitialState() {
     const dungeon = getDungeon(0);
     const player = new Player(dungeon);
+    return { dungeon, player };
+  }
 
-    this.state = { dungeon, player };
-
-    document.addEventListener('keydown', this.handleKeyDown.bind(this), false);
-
-    ///document.addEventListener('keydown', _.debounce(this.handleKeyDown.bind(this)), false);
+  levelUp(player) {
+    const dungeon = getDungeon(player.level + 1);
+    player.levelUp(dungeon);
+    this.setState({ dungeon, player });
   }
 
   handleKeyDown(e) {
     const player = this.state.player;
-    let dungeon = this.state.dungeon;
+    const dungeon = this.state.dungeon;
 
     player.move(e.keyCode, dungeon);
+
     this.setState({ dungeon, player });
 
     if (player.isDead()) {
       window.alert('Game Over!');
-      window.location.reload();
+      this.setState(this.getInitialState());
     }
 
     if (player.isVictorious()) {
       window.alert('Victory!');
-      window.location.reload();
+      this.setState(this.getInitialState());
     }
 
     if (player.shouldLevelUp()) {
-      dungeon = getDungeon(player.level);
-      player.levelUp(dungeon);
-      this.setState({ dungeon, player });
+      this.levelUp(player);
     }
   }
 
-  getItemsAroundPlayer() {
+  getDungeonView() {
     const viewBoxOrigin = this.state.player.origin.plus(new Vector(-5, -5));
     const viewBox = [];
     for (let i = 0, row; i < 11; i++) {
@@ -63,7 +64,7 @@ class App extends Component {
     return (
       <div className="App">
         <h1>Dungeon Crawler</h1>
-        <div className='dungeon'>{this.getItemsAroundPlayer()}</div>
+        <div className='dungeon'>{this.getDungeonView()}</div>
         <div className="dashboard">
           <div><strong>Health: </strong>{this.state.player.health}</div>
           <div><strong>Level: </strong>{this.state.player.level}</div>

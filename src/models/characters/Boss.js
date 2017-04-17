@@ -21,8 +21,7 @@ Boss.prototype.reactToPlayer = function(player, dungeon) {
 
 Boss.prototype.battle = function(player) {
   var random = new Random(0, 2);
-  var damage = random.x;
-  player.health -= damage;
+  player.health -= random.x;
 };
 
 module.exports = Boss;

@@ -22,12 +22,11 @@ Enemy.prototype.reactToPlayer = function(player, dungeon) {
 
 Enemy.prototype.battle = function(player) {
   var power = Math.pow(2, this.level + 1);
-  var percentHealthItem = 1 / Math.ceil(20 / power); // ranges from 10% to 100%
+  var percentHealthItem = 1 / Math.ceil(20 / power); // [0.1, 1]
   var maxDamage = Math.floor(20 * percentHealthItem);
-  var minDamage = Math.floor(maxDamage * 0.75); // adjust damage range here
-  var random = new Random(minDamage, maxDamage + 1); // add 1 to make randomInRange inclusive
-  var damage = random.x;
-  player.health -= damage;
+  var minDamage = Math.floor(maxDamage * 0.75);
+  var random = new Random(minDamage, maxDamage + 1); // + 1 => inclusive
+  player.health -= random.x;
 };
 
 module.exports = Enemy;

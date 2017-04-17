@@ -4,9 +4,43 @@
   text-align: center;
 }
 
+.dungeon {
+  background: grey;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  width: 132px;
+}
+
+.cell {
+  width: 12px;
+  height: 12px;
+}
+
+.floor {
+  background: white;
+}
+
+.health {
+  background: green;
+}
+
+.player {
+  background: blue;
+}
+
+.enemy, .boss {
+  background: red;
+}
+
+.weapon {
+  background: gold;
+}
+
 .dashboard {
   color: white;
   margin: 0 auto;
   padding-top: 20px;
+  white-space: nowrap;
   width: 132px;
 }

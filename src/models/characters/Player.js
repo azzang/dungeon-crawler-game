@@ -8,7 +8,7 @@ function Player(dungeon) {
   Square.call(this, 1, null, 'player');
   this.health = 100;
   this.weaponName = 'stick';
-  this.weaponLethality = 10; // ranges from 10 to 60
+  this.weaponLethality = 10; // [10, 60]
   this.level = 0;
   this.experience = 0;
   this.drawRandomly(dungeon);
@@ -33,18 +33,20 @@ Player.prototype.getDestination = function(keyCode) {
 
 Player.prototype.move = function(keyCode, dungeon) {
   var destination = this.getDestination(keyCode);
-  var itemInWay = dungeon[destination.y][destination.x];
-  itemInWay.reactToPlayer(this, dungeon);
+  var row = dungeon[destination.y];
+  var itemInWay = row ? row[destination.x] : undefined;
+  if (itemInWay) {
+    itemInWay.reactToPlayer(this, dungeon);
+  }
   return dungeon;
 };
 
 Player.prototype.battle = function(enemy) {
-  var power = (this.level + 1) * this.weaponLethality; // ranges from 10 to 300
-  var minDamage = Math.round(((9 * power) + 100) / 28); // ranges from 7 to 100
-  var maxDamage = Math.round(minDamage / 0.75); // adjust damage range here
+  var power = (this.level + 1) * this.weaponLethality; // [10, 300]
+  var minDamage = Math.round(((9 * power) + 100) / 28); // [7, 100]
+  var maxDamage = Math.round(minDamage / 0.75);
   var random = new Random(minDamage, maxDamage);
-  var damage = random.x;
-  enemy.health -= damage;
+  enemy.health -= random.x;
 };
 
 Player.prototype.shouldLevelUp = function() {
